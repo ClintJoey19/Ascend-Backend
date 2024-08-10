@@ -20,6 +20,40 @@ model User {
   email      String   @unique
   password   String
   profileImg String?
-  role       String
+  role       String // user | agent
   createdAt  DateTime @default(now())
+}
+
+model Project {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  description String?
+  price Int?
+  location String?
+  type String? // buy | rent
+  propertyType String? // house | apartment | condo unit
+  bedroom Int?
+  bathroom Int?
+  parking String? // indoor | outdoor
+  area Int?
+  constructed DateTime?
+  features String[]
+  agentId String?
+  createdAt DateTime @default(now())
+}
+
+model Booking {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  status String
+  tourDate DateTime
+  createdAt DateTime @default(now())
+}
+
+model Chat {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  message String
+  isRead Boolean @default(false)
+  senderId String
+  receiverId String
+  createdAt DateTime @default(now())
 }
