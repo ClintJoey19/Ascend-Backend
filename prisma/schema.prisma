@@ -14,46 +14,84 @@ datasource db {
 }
 
 model User {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
   firstname  String
   lastname   String
-  email      String   @unique
+  email      String    @unique
   password   String
   profileImg String?
-  role       String // user | agent
-  createdAt  DateTime @default(now())
+  role       Role      @default(user)
+  createdAt  DateTime  @default(now())
+  projects   Project[]
+  bookings   Booking[]
+  // senders Chat[] @relation("SenderOnChat")
+  // receivers Chat[] @relation("ReceiverOnChat")
+}
+
+enum Role {
+  user
+  agent
 }
 
 model Project {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  name String
-  description String?
-  price Int?
-  location String?
-  type String? // buy | rent
-  propertyType String? // house | apartment | condo unit
-  bedroom Int?
-  bathroom Int?
-  parking String? // indoor | outdoor
-  area Int?
-  constructed DateTime?
-  features String[]
-  agentId String?
-  createdAt DateTime @default(now())
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  isPublished  Boolean       @default(false)
+  description  String?
+  price        Int?
+  location     String?
+  latitude     Float?
+  longitude    Float?
+  type         ProjectType? // buy | rent
+  propertyType PropertyType? // house | apartment | condo unit
+  bedroom      Int?
+  bathroom     Int?
+  parking      Parking? // indoor | outdoor
+  area         Int?
+  constructed  String?
+  features     String[]
+  images       String[]
+  agent        User          @relation(fields: [agentId], references: [id])
+  agentId      String        @db.ObjectId
+  createdAt    DateTime      @default(now())
+
+  // @@index([id])
+}
+
+enum ProjectType {
+  Buy
+  Rent
+}
+
+enum PropertyType {
+  House
+  Apartment
+  Condo     @map("Condo Unit")
+}
+
+enum Parking {
+  Indoor
+  Outdoor
 }
 
 model Booking {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  status String
-  tourDate DateTime
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  status    String
+  tourDate  DateTime
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @db.ObjectId
   createdAt DateTime @default(now())
 }
 
-model Chat {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  message String
-  isRead Boolean @default(false)
-  senderId String
-  receiverId String
-  createdAt DateTime @default(now())
-}
+// model Chat {
+//   id String @id @default(auto()) @map("_id") @db.ObjectId
+//   message String
+//   isRead Boolean @default(false)
+//   sender User @relation(fields: [senderId], references: [id], onDelete: Cascade)
+//   senderId String @db.ObjectId
+//   receiver User @relation(fields: [receiverId], references: [id], onDelete: Cascade)
+//   receiverId String @db.ObjectId
+//   createdAt DateTime @default(now())
+
+//   @@index([senderId, receiverId])
+// }

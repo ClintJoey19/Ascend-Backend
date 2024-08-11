@@ -1,3 +1,5 @@
+import prisma from "../lib/prisma.js";
+
 export const getUsers = (req, res) => {
   // get users
 };
@@ -10,11 +12,30 @@ export const addUser = (req, res) => {
   // add user
 };
 
-export const updateUser = (req, res) => {
+export const updateUser = async (req, res) => {
   // update user here
-  console.log(req.body);
+  const { id, firstname, lastname, email, profileImg } = req.body;
 
-  res.send({ message: "Success" });
+  try {
+    const user = await prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        firstname,
+        lastname,
+        email,
+        profileImg,
+      },
+    });
+
+    if (!user) return res.status(500).json("Error updating user");
+
+    res.status(201).json(user);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json("Error updating user");
+  }
 };
 
 export const deleteUser = (req, res) => {
